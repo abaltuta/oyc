@@ -1,0 +1,29 @@
+{
+  "srcDir": "src",
+  "srcFiles": [],
+  "specDir": ".",
+  "specFiles": [
+    "test/**/*test.js"
+  ],
+  "helpers": [
+    "test/helpers/**/*.js"
+  ],
+  "esmFilenameExtension": ".js",
+  "enableTopLevelAwait": false,
+  "env": {
+    "failSpecWithNoExpectations": true,
+    "stopSpecOnExpectationFailure": false,
+    "stopOnSpecFailure": false,
+    "random": true
+  },
+  "importMap": {
+    "moduleRootDir": ".", 
+    "imports": {
+      "sinon":"./node_modules/sinon/pkg/sinon-esm.js",
+      "oyc": "./src/oyc.js"
+     }
+  },
+  "browser": {
+    "name": "firefox"
+  }
+}

@@ -1,17 +1,19 @@
 {
   "name": "oyc",
   "version": "0.0.1",
-  "description": "",
+  "description": "An attempt at a framework",
   "author": "Andrei Baltuta <andrei@baltuta.eu>",
   "license": "MIT",
   "type": "module",
   "main": "src/oyc.js",
   "scripts": {
-    "test": "mocha"
+    "test:j": "jasmine --config=jasmine-browser.json",
+    "test": "jasmine-browser-runner runSpecs --config=jasmine-browser.json",
+    "test:dev": "jasmine-browser-runner serve --config=jasmine-browser.json"
   },
   "devDependencies": {
-    "chai": "4.3.7",
-    "mocha": "^10.2.0",
+    "jasmine": "5.1.0",
+    "jasmine-browser-runner": "2.3.0",
     "sinon": "17.0.1"
   }
 }
