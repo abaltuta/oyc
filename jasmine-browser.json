@@ -19,7 +19,6 @@
   "importMap": {
     "moduleRootDir": ".", 
     "imports": {
-      "sinon":"./node_modules/sinon/pkg/sinon-esm.js",
       "oyc": "./src/oyc.js"
      }
   },

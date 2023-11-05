@@ -74,7 +74,9 @@ async function handleFetch(method, url, element) {
   const response = await fetch(request);
   if (response.ok) {
     const html = await response.text();
+    console.log(element, html)
     swapHTML(element, html);
+    console.log(element.innerHTML);
   }
 }
 
@@ -107,7 +109,7 @@ function processElement(element) {
       addTriggerHandler(element, function (event) {
         // TODO: Disable this element's processing while the request is in progress
         // add a boolean to the element?
-        handleFetch(
+        void handleFetch(
           httpMethods[index],
           getAttribute(element, "oyc-" + httpMethods[index]),
           event.target
