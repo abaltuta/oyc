@@ -74,9 +74,7 @@ async function handleFetch(method, url, element) {
   const response = await fetch(request);
   if (response.ok) {
     const html = await response.text();
-    console.log(element, html)
     swapHTML(element, html);
-    console.log(element.innerHTML);
   }
 }
 

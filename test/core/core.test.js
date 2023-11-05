@@ -12,7 +12,6 @@ describe("Core", () => {
     fetchSpy = spyOn(window, "fetch");
   });
   afterAll(() => {
-    console.log(fetchSpy);
     fetchSpy.calls.reset();
   });
   beforeEach(() => {
