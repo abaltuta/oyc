@@ -4,52 +4,49 @@ import {
   makeResponse,
   makeTestArea,
 } from "../helpers/test-utils.js";
-import Oyc from "oyc";
+import { waitFor } from "@testing-library/dom";
+import {
+  beforeAll,
+  beforeEach,
+  afterAll,
+  afterEach,
+  expect,
+  describe,
+  test,
+  vi,
+} from "vitest";
 
 describe("Core", () => {
+  /**
+   * @type {SpyInstance<ReturnType<WindowOrWorkerGlobalScope["fetch"]>>}
+   */
   let fetchSpy = null;
-  beforeAll(() => {
-    fetchSpy = spyOn(window, "fetch");
-  });
-  afterAll(() => {
-    fetchSpy.calls.reset();
-  });
   beforeEach(() => {
+    fetchSpy = vi.spyOn(window, "fetch");
     makeTestArea();
   });
   afterEach(() => {
     clearTestArea();
+    vi.restoreAllMocks();
   });
 
-  it("handles basic get properly", function (done) {
-    const response = makeResponse("It worked!");
-    fetchSpy.and.resolveTo(response);
+  test("handles http verbs properly", async function (done) {
 
-    const button = addTestHTML('<button oyc-get="/test">Click Me!</button>');
-    button.click();
+    const methodVerbs = ["get", "post", "put", "patch", "delete", "head"];
 
-    // Wait for the fetch promise to resolve
-    setTimeout(() => {
-      expect(fetchSpy).toHaveBeenCalledWith("/test", { method: "GET" });
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
-      expect(button.innerHTML).toBe("It worked!");
-      done(); // Signal Jasmine that the async test is complete
-    }, 1)
-  });
+    for (const method of methodVerbs) {
+    fetchSpy.mockResolvedValueOnce(makeResponse(`Testing ${method} worked!`));
+      const button = addTestHTML(
+        `<button oyc-${method}="/test">Testing ${method}</button>`
+      );
+      button.click();
 
-  it("handles basic post properly", function (done) {
-    const response = makeResponse("It worked!");
-    fetchSpy.and.resolveTo(response);
+      expect(fetchSpy).toHaveBeenCalledWith("/test", { method: method.toUpperCase() });
+      await waitFor(() => {
+        expect(button.innerHTML).toBe(`Testing ${method} worked!`);
+      });
+    }
 
-    const button = addTestHTML('<button oyc-post="/test">Click Me!</button>');
-    button.click();
-
-    // Wait for the fetch promise to resolve
-    setTimeout(() => {
-      expect(fetchSpy).toHaveBeenCalledWith("/test", { method: "POST" });
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
-      expect(button.innerHTML).toBe("It worked!");
-      done(); // Signal Jasmine that the async test is complete
-    }, 1)
+    expect(fetchSpy.mock.calls.length).toBe(methodVerbs.length);
   });
 });

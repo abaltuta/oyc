@@ -1,0 +1,41 @@
+{
+  "numTotalTestSuites": 2,
+  "numPassedTestSuites": 2,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 1,
+  "numPassedTests": 0,
+  "numFailedTests": 1,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "startTime": 1699217732413,
+  "success": false,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "",
+            "Core"
+          ],
+          "fullName": " Core handles http verbs properly",
+          "status": "failed",
+          "title": "handles http verbs properly",
+          "duration": 1016,
+          "failureMessages": [
+            "expected 'Testing post' to be 'It worked!' // Object.is equality\n\nIgnored nodes: comments, script, style\n<html\n  lang=\"en\"\n>\n  <head>\n    \n    \n    <meta\n      charset=\"UTF-8\"\n    />\n    \n    \n    <link\n      href=\"/favicon.svg\"\n      rel=\"icon\"\n      type=\"image/svg+xml\"\n    />\n    \n    \n    <meta\n      content=\"width=device-width, initial-scale=1.0\"\n      name=\"viewport\"\n    />\n    \n    \n    <title>\n      Vitest Browser Runner\n    </title>\n    \n    \n    \n    \n    \n  \n  </head>\n  \n  \n  <body>\n    \n    \n    <iframe\n      id=\"vitest-ui\"\n      src=\"/__vitest__/\"\n    />\n    \n    \n    \n    \n  \n\n\n    <div\n      id=\"test-area\"\n    >\n      <button\n        oyc-get=\"/test\"\n      >\n        It worked!\n      </button>\n      <button\n        oyc-post=\"/test\"\n      >\n        Testing post\n      </button>\n    </div>\n  </body>\n</html>"
+          ],
+          "location": {
+            "line": 39,
+            "column": 17
+          }
+        }
+      ],
+      "startTime": 1699218042567,
+      "endTime": 1699218043583,
+      "status": "failed",
+      "message": "",
+      "name": "D:/Dev Projects/oyc/test/core/core.test.js"
+    }
+  ]
+}

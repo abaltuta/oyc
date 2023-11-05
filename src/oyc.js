@@ -21,7 +21,7 @@ const defaultTrigger = {
 
 //#endregion
 
-class Oyc {
+export class Oyc {
   ready = document.readyState === "complete";
   on = addEventListener;
   off = removeEventListener;
@@ -68,10 +68,9 @@ class Oyc {
 //#region Fetch
 
 async function handleFetch(method, url, element) {
-  const request = new Request(url, {
-    method,
+  const response = await fetch(url, {
+    method: method.toUpperCase(),
   });
-  const response = await fetch(request);
   if (response.ok) {
     const html = await response.text();
     swapHTML(element, html);
@@ -434,7 +433,7 @@ function parseTrigger(triggerString) {
 }
 //#endregion
 
+export const oyc = new Oyc();
 if (typeof window !== "undefined") {
   window.oyc = new Oyc();
 }
-export default Oyc;

@@ -1,13 +1,4 @@
-
-
-export function makeServer() {
-  const server = sinon.fakeServer.create();
-  server.fakeHTTPMethods = true;
-  server.getHTTPMethod = function (xhr) {
-    return getHTTPMethod(xhr);
-  };
-  return server;
-}
+import { oyc } from "../../src/oyc.js";
 
 export function makeResponse(content) {
   return new Response(typeof content === "string" ? content : JSON.stringify(content), { status: 200, statusText: 'OK', });
