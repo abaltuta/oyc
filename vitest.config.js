@@ -8,10 +8,6 @@ export default defineConfig({
       reporter: ['text', 'html'],
       reportsDirectory: 'coverage'
     },
-    benchmark: {
-      reporters: ['json'],
-      outputFile: 'benchmark-results.json',      
-    },
     browser: {
       enabled: true,
       // headless: true,
