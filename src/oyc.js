@@ -18,7 +18,7 @@ const defaultTrigger = {
   event: "click",
   modifiers: undefined,
 };
-  
+
 //#endregion
 
 class Oyc {
@@ -26,15 +26,15 @@ class Oyc {
   on = addEventListener;
   off = removeEventListener;
   getOycData = getData;
-  
+  process = processElementAndChildren;
+
   constructor() {
-    if (!window || !document) {
-      return undefined;
-    }
     // Are we already loaded? This shouldn't happen since we recomment loading this script as a module
-    if (!this.ready) {
-      document.addEventListener("DOMContentLoaded", function () {
-        this.ready = true;
+    if (this.ready == false) {
+      document.addEventListener("readystatechange", (event) => {
+        if (event.target.readyState === "complete") {
+          this.ready = true;
+        }
       });
     }
 
@@ -45,21 +45,24 @@ class Oyc {
   }
 
   /**
- * Execute a function now if DOMContentLoaded has fired, otherwise listen for it.
- *
- */
- onReady(fn) {
-  // HTMX handles the following edge case so we should too.
-  //
-  // Checking readyState here is a failsafe in case the oyc script tag entered the DOM by
-  // some means other than the initial page load.
-  if (this.ready) {
-    fn();
-  } else {
-    document.addEventListener("DOMContentLoaded", fn);
+   * Execute a function now if DOMContentLoaded has fired, otherwise listen for it.
+   *
+   */
+  onReady(fn) {
+    // HTMX handles the following edge case so we should too.
+    //
+    // Checking readyState here is a failsafe in case the oyc script tag entered the DOM by
+    // some means other than the initial page load.
+    if (this.ready) {
+      fn();
+    } else {
+      document.addEventListener("readystatechange", (event) => {
+        if (event.target.readyState === "complete") {
+          fn();
+        }
+      });
+    }
   }
-}
-
 }
 
 //#region Fetch
@@ -431,7 +434,7 @@ function parseTrigger(triggerString) {
 }
 //#endregion
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.oyc = new Oyc();
 }
 export default Oyc;

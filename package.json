@@ -7,9 +7,7 @@
   "type": "module",
   "main": "src/oyc.js",
   "scripts": {
-    "test:j": "jasmine --config=jasmine-browser.json",
-    "test": "jasmine-browser-runner runSpecs --config=jasmine-browser.json",
-    "test:dev": "jasmine-browser-runner serve --config=jasmine-browser.json"
+    "test": "jasmine-browser-runner runSpecs --config=jasmine-browser.json"
   },
   "devDependencies": {
     "jasmine": "5.1.0",

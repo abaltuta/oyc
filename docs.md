@@ -27,6 +27,7 @@ Long term goals
 Self-imposed limitations
 - modern JS wherever possible (fetch, intersection observer)
 - try to reduce the amount of object creation
+- try to store as much information as possible in the element itself.
 - package as a ES Module
 - support attributes beginning with both `oyc` and `data-oyc`
 - NO IE 11 Support
