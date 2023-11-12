@@ -93,13 +93,17 @@ describe.shuffle("Core", () => {
   describe("Modifiers", () => {
     // TODO: Fix this to use fake Timers. I get an error on both FF and Chrome
     // Looks like something upstream, we are using the beta version
-    beforeEach(() => {
-      // vi.useFakeTimers();
+    beforeAll(() => {
+      vi.useFakeTimers({
+        toFake: ["setTimeout"]
+      });
     });
-    afterEach(() => {
-      // vi.useRealTimers();
-    });
+    afterAll(() => {
+      vi.useRealTimers();
+    })
     test("Delay", async () => {
+      vi.useFakeTimers();
+
       fetchSpy.mockResolvedValueOnce(makeResponse(`Testing delay worked!`));
 
       const button = addTestHTML(
@@ -108,14 +112,11 @@ describe.shuffle("Core", () => {
       button.click();
 
       expect(fetchSpy).toHaveBeenCalledTimes(0);
-      // vi.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
 
       await waitFor(
         () => {
           expect(button.innerHTML).toBe(`Testing delay worked!`);
-        },
-        {
-          timeout: 3000,
         }
       );
       expect(fetchSpy).toHaveBeenCalledTimes(1);
