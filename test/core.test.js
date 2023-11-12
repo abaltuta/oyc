@@ -4,13 +4,13 @@ import {
   getTestArea,
   makeResponse,
   makeTestArea,
-} from "../helpers/test-utils.js";
+} from "./test-utils.js";
 import { screen, waitFor } from "@testing-library/dom";
 import { afterAll } from "vitest";
 import { beforeAll } from "vitest";
 import { beforeEach, afterEach, expect, describe, test, vi } from "vitest";
 
-describe.shuffle("Core", () => {
+describe("Core", () => {
   /**
    * @type {SpyInstance<ReturnType<WindowOrWorkerGlobalScope["fetch"]>>}
    */

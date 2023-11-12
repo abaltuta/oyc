@@ -1,33 +1,21 @@
+import { handleFetch } from "./fetch.js";
+import { httpMethods } from "./static.js";
 import {
-  getAttribute,
+  addEventListener,
+  findElementsToProcess,
   findOnElements,
+  getAttribute,
+  getData,
   hasAttribute,
-  parseInterval,
+  parseTrigger,
+  removeEventListener,
 } from "./utils.js";
 
 //#region Static data and initializations
-
-const oycDataAttribute = "oyc-data";
-
-const httpMethods = ["get", "post", "put", "patch", "delete", "head"];
-
-const methodSelector = httpMethods
-  .flatMap((method) => [`[oyc-${method}]`, `[data-oyc-${method}]`])
-  .join(",");
-
-const oycAttributes = ["trigger"];
-
-const oycAttributeSelector = oycAttributes
-  .flatMap((attribute) => [`[oyc-${attribute}]`, `[data-oyc-${attribute}]`])
-  .join(",");
-
 const defaultTrigger = {
   event: "click",
   modifiers: undefined,
 };
-
-// We reuse the DOMParser instead of creating a new one
-const domParser = new DOMParser();
 
 //#endregion
 
@@ -77,105 +65,10 @@ export class Oyc {
 
 //#region Fetch
 
-async function handleFetch(method, url, element) {
-  const response = await fetch(url, {
-    method: method.toUpperCase(),
-  });
-  if (response.ok) {
-    const html = await response.text();
-    swapInnerHTML(element, html);
-  }
-}
 
 //#endregion
 
 //#region Core
-
-/**
- * Parses an HTML string and returns a document fragment containing the parsed HTML.
- * @param {string} htmlString - The HTML string to parse.
- * @param {string} [outputSelector] - Optional CSS selector for selecting a specific element from the parsed HTML.
- * @returns {DocumentFragment|HTMLElement} - The parsed HTML as a document fragment or a selected element.
- */
-function parseHTML(htmlString, outputSelector) {
-  // TODO: Support full body refreshes and title changes
-  // We wrap the html string inside a body tag
-  // Looking at the htmx part of the code this appears to avoid some weirdness around parsing `table` tags and friends
-  // TODO: verify this assumption
-  // TODO: handle scripts
-  const parsedHTML = domParser.parseFromString(`<body><template>${htmlString}</template></body>`, "text/html");
-
-  if (parseHTML === null) {
-    return document.createDocumentFragment();
-  }
-
-  if (outputSelector) {
-    return parsedHTML.querySelector(outputSelector);
-  }
-
-  return parsedHTML.querySelector('template').content;
-}
-
-/**
- * Inserts a fragment of HTML elements before a specified element in the DOM tree.
- * @param {Node} parent - The parent element where the fragment will be inserted.
- * @param {Node} insertBeforeElement - The element before which the fragment will be inserted.
- * @param {DocumentFragment} fragment - The fragment of HTML elements to be inserted.
- * @returns {void}
- */
-function insertBefore(parent, insertBeforeElement, fragment) {
-  while(fragment.childNodes.length > 0) {
-    const child = fragment.firstChild;
-    parent.insertBefore(child, insertBeforeElement);
-    if (child.nodeType !== Node.TEXT_NODE && child.nodeType !== Node.COMMENT_NODE) {
-      // TODO: process this later after all have been inserted because some code may expect all html to exist
-      processElement(child);
-    }
-  }
-}
-
-/**
- * Replaces the outer HTML of a target element with the provided HTML string.
- * 
- * @param {HTMLElement} targetElement - The target element whose outer HTML needs to be replaced.
- * @param {string} htmlString - The HTML string to replace the outer HTML of the target element.
- * @returns {void}
- */
-function swapOuterHTML(targetElement, htmlString) {
-  const fragment = parseHTML(htmlString);
-  const previousSibling = targetElement.previousSibling;
-  insertBefore(targetElement.parentElement, previousSibling, fragment);
-  
-  // Remove the remaining HTML
-  // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this
-  targetElement.remove();
-}
-
-/**
- * Replaces the HTML content of a target element with new HTML content.
- * @param {HTMLElement} targetElement - The element whose HTML content will be replaced.
- * @param {string} htmlString - The new HTML content to replace the old content with.
- * @returns {void}
- */
-function swapInnerHTML(targetElement, htmlString) {
-  // TODO: Support multiple strategies for swapping HTML
-  // TODO: Support full body refreshes and title changes
-
-  const fragment = parseHTML(htmlString);
-  const firstChild = targetElement.firstChild;
-  
-  insertBefore(targetElement, firstChild, fragment);
-  
-  // Remove the remaining HTML
-  // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this
-  if (firstChild) {
-    while(firstChild.nextSibling) {
-      targetElement.removeChild(firstChild.nextSibling);
-    }
-    targetElement.removeChild(firstChild);
-    // TODO: Clean up existing elements including event handlers
-  }
-}
 
 function addTriggerHandler(element, listener) {
   const trigger = parseTrigger(getAttribute(element, "oyc-trigger"));
@@ -191,7 +84,7 @@ function addTriggerHandler(element, listener) {
   }
 }
 
-function processElement(element) {
+export function processElement(element) {
   for (let index = 0; index < httpMethods.length; index++) {
     if (hasAttribute(element, "oyc-" + httpMethods[index])) {
       addTriggerHandler(element, function (event) {
@@ -268,48 +161,6 @@ function removeCustomEventListeners(element) {
 }
 
 /**
- * Adds an event listener to the given element for the specified event.
- * @param {HTMLElement} [element] - The element to add the event listener to. Defaults to the document body.
- * @param {string} eventName - The name of the event to listen for.
- * @param {EventListenerOrEventListenerObject} listener - The listener function to call when the event is triggered.
- * @param {Modifier} modifier - The trigger object that describes how to handle the event.
- */
-function addEventListener(element, eventName, listener, modifier) {
-  if (!modifier || Object.keys(modifier).length === 0) {
-    element.addEventListener(eventName, listener);
-    return;
-  }
-
-  // If there is a modifier then wrap the listener function
-  const listenerWrapper = function (event) {
-    if (modifier.delay) {
-      setTimeout(() => {
-        listener(event);
-      }, modifier.delay);
-      return;
-    }
-    if (modifier.throttle) {
-      throw new Error("Throttle is not yet implemented");
-    }
-    if (modifier.debounce) {
-      throw new Error("Debounce is not yet implemented");
-    }
-
-    listener(event);
-  };
-  element.addEventListener(eventName, listenerWrapper, modifier);
-}
-/**
- * Removes an event listener from the specified element.
- * @param {HTMLElement} [element] - The element to remove the event listener from.
- * @param {string} eventName - The name of the event.
- * @param {EventListenerOrEventListenerObject} listener - The callback function to remove.
- */
-function removeEventListener(element, eventName, listener) {
-  element.removeEventListener(eventName, listener);
-}
-
-/**
  * Process the given element and its children.
  * This means:
  *    - Add event listeners
@@ -335,127 +186,6 @@ function processElementAndChildren(element) {
   addCustomEventListeners(element);
 }
 
-//#endregion
-
-//#region Utilities
-
-// TODO: Figure out a way to type this
-function getData(element) {
-  // An alternative to just adding this to the element is to use a WeakMap
-  // I'm unsure if that would make any significant difference in performance
-  // This is simpler to add 🤷‍♀️
-  return element[oycDataAttribute] || {};
-}
-
-/**
- * Finds all elements within the given element that match the method selector or the OYC attribute selector.
- * @param {Element} element - The element to search within.
- * @returns {NodeList} - A list of matching elements.
- */
-function findElementsToProcess(element) {
-  if (element.querySelectorAll) {
-    return element.querySelectorAll(
-      methodSelector + "," + oycAttributeSelector
-    );
-  } else {
-    return [];
-  }
-}
-
-/**
- * @typedef {Object} Modifier
- * @property {boolean} once
- * @property {boolean} prevent
- * @property {string} delay
- * @property {string} throttle
- * @property {string} debounce
- * @property {boolean} capture
- * @property {boolean} passive
- * @property {string} from
- */
-
-/**
- * @typedef {Object} Trigger
- * @property {string} event
- * @property {Modifier} modifiers
- */
-
-// The trigger string is a comma-separated list of triggers
-// These look like this "[event] [modifier1] [modifier2] [modifier3]"
-// TODO: add support for events like:
-//    - load
-//    - revealed - when it first scrolls into the viewport
-//    - intersect - when it intersects with another element
-// Modifiers can be:
-//    - once
-//    - prevent
-//    - poll:<time_interval> - can be in ms, s or m
-//    - delay:<time_interval> - can be in ms, s or m
-//    - throttle:<time_interval> - can be in ms, s or m
-//    - debounce:<time_interval> - can be in ms, s or m
-//    - capture
-//    - passive
-//    - from:<CSS Selector>
-// TODO: support "changed" event
-// TODO: support more selectors https://htmx.org/docs/#extended-css-selectors
-/**
- * Parses a trigger string into an object with event and modifiers.
- * @param {string} triggerString - The trigger string to parse.
- * @returns {Trigger | undefined} An object with the event name and an array of modifiers.
- */
-function parseTrigger(triggerString) {
-  if (!triggerString) {
-    return undefined;
-  }
-  // TODO: rewrite this to be more efficient
-  // Read it character by character and consume tokens instead
-  let parts = triggerString.split(" ");
-
-  const event = parts[0];
-  /**
-   * @type {Modifier}
-   */
-  const modifiers = {};
-
-  for (let index = 1; index < parts.length; index++) {
-    const modifier = parts[index].trim();
-
-    if (!parts[index].trim()) {
-      continue;
-    }
-
-    // First we check for the simple modifiers
-    switch (modifier) {
-      case "once":
-      case "prevent":
-      case "capture":
-      case "passive": {
-        modifiers[modifier] = true;
-        continue;
-      }
-    }
-
-    // If we get here, it's a more complex modifier
-    const complexPart = modifier.split(":");
-    const name = complexPart[0];
-    const value = complexPart[1];
-
-    switch (name) {
-      case "poll":
-      case "delay":
-      case "throttle":
-      case "debounce": {
-        modifiers[name] = parseInterval(value);
-        continue;
-      }
-    }
-  }
-
-  return {
-    event,
-    modifiers,
-  };
-}
 //#endregion
 
 /**

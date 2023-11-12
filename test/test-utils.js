@@ -1,12 +1,19 @@
-import { oyc } from "../../src/oyc.js";
+import { oyc } from "../src/oyc.js";
 
 /**
- * Creates a new Response object with the given content and default status code 200. Used primarily for testing
- * @param {string|Object} content - The content to be included in the response.
- * @returns {Response} - The new Response object.
+ * Creates a new Response object with the given content and status.
+ * @param {string|Object} content - The content to include in the response. If an object is provided, it will be serialized to JSON.
+ * @param {boolean} [ok=true] - Whether the response should be considered successful or not.
+ * @returns {Response} A new Response object.
  */
-export function makeResponse(content) {
-  return new Response(typeof content === "string" ? content : JSON.stringify(content), { status: 200, statusText: 'OK', });
+export function makeResponse(content, ok = true) {
+  // Create an error Response if ok is false
+  return new Response(
+    typeof content === "string" ? content : JSON.stringify(content),
+    ok
+      ? { status: 200 }
+      : { status: 500 }
+  );
 }
 
 /**
