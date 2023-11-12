@@ -14,7 +14,7 @@ export default defineConfig({
     },
     browser: {
       enabled: true,
-      headless: true,
+      headless: !testProd,
       name: 'firefox'
     },
     watch: !testProd
