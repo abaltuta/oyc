@@ -26,6 +26,7 @@ const defaultTrigger = {
   modifiers: undefined,
 };
 
+// We reuse the DOMParser instead of creating a new one
 const domParser = new DOMParser();
 
 //#endregion
@@ -101,6 +102,7 @@ function parseHTML(htmlString, outputSelector) {
   // We wrap the html string inside a body tag
   // Looking at the htmx part of the code this appears to avoid some weirdness around parsing `table` tags and friends
   // TODO: verify this assumption
+  // TODO: handle scripts
   const parsedHTML = domParser.parseFromString(`<body><template>${htmlString}</template></body>`, "text/html");
 
   if (parseHTML === null) {
@@ -114,6 +116,13 @@ function parseHTML(htmlString, outputSelector) {
   return parsedHTML.querySelector('template').content;
 }
 
+/**
+ * Inserts a fragment of HTML elements before a specified element in the DOM tree.
+ * @param {Node} parent - The parent element where the fragment will be inserted.
+ * @param {Node} insertBeforeElement - The element before which the fragment will be inserted.
+ * @param {DocumentFragment} fragment - The fragment of HTML elements to be inserted.
+ * @returns {void}
+ */
 function insertBefore(parent, insertBeforeElement, fragment) {
   while(fragment.childNodes.length > 0) {
     const child = fragment.firstChild;
@@ -125,6 +134,13 @@ function insertBefore(parent, insertBeforeElement, fragment) {
   }
 }
 
+/**
+ * Replaces the outer HTML of a target element with the provided HTML string.
+ * 
+ * @param {HTMLElement} targetElement - The target element whose outer HTML needs to be replaced.
+ * @param {string} htmlString - The HTML string to replace the outer HTML of the target element.
+ * @returns {void}
+ */
 function swapOuterHTML(targetElement, htmlString) {
   const fragment = parseHTML(htmlString);
   const previousSibling = targetElement.previousSibling;
