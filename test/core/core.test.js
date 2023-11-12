@@ -91,10 +91,11 @@ describe.shuffle("Core", () => {
   });
 
   describe("Modifiers", () => {
-    // TODO: Fix this to use fake Timers. I get an error on both FF and Chrome
     // Looks like something upstream, we are using the beta version
     beforeAll(() => {
       vi.useFakeTimers({
+        // by default vitest attempts to patch `setImmediate` this doesn't exist in most browsers apart from old versions of Edge
+        // We pass in what we want to fake manually to avoid this issue. We don't need the whole api faked anyway
         toFake: ["setTimeout"]
       });
     });
