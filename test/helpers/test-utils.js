@@ -1,4 +1,4 @@
-import { oyc } from "../../src/oyc.js";
+import { oyc } from "oyc";
 
 export function makeResponse(content) {
   return new Response(typeof content === "string" ? content : JSON.stringify(content), { status: 200, statusText: 'OK', });

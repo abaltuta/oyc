@@ -1,4 +1,4 @@
-import { parseInterval } from "../../src/oyc.js";
+import { parseInterval } from "../../src/utils.js";
 import { expect, describe, test } from 'vitest'
 
 describe('Internals', () => {

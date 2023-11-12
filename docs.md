@@ -4,7 +4,7 @@ Old man Yells at Cloud is an attempt at a simple front-end framework. It's best 
 
 Short term goals
 - better define flow and document the process at the beginning of the script
-- processElementsAndChildren when swapping inner html
+- processElementsAndChildren when swapping inner html recursively
 - combine `on` attribute handling with general attribute handling
 - add ignore attribute
 - support inputs
@@ -14,7 +14,7 @@ Short term goals
 - example page
 - inherited attributes?
 - add support for `withCredentials` when doing a fetch
-- similar to hx-sync
+- hx-sync-like
 - investigate plugin system
 - build script with minification
 - add UMD insanity?
