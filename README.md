@@ -10,7 +10,7 @@ If you want to contribute, there's a ton of TODOs scattered throughout the repo.
 
 # Short term goals
 - better define flow and document the process at the beginning of the script
-- processElementAndChildren when swapping inner html recursively
+- clean up elements when deleting them
 - combine `on` attribute handling with general attribute handling
 - add ignore attribute
 - support inputs
