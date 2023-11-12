@@ -2,7 +2,7 @@ OYC - Old man Yells at Clouds
 
 (name not final)
 
-Is an attempt to copy htmx as a learning experience.
+Is an attempt to copy htmx as a learning experience. It has some differences to htmx because of the self-imposed limitations.
 
 Don't expect much. There's an `index.html` which has a very small example. There's also _some_ tests.
 
