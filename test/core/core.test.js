@@ -72,6 +72,24 @@ describe.shuffle("Core", () => {
     expect(fetchSpy.mock.calls.length).toBe(3);
   });
 
+  test("On event handlers", async () => {
+    const consoleSpy = vi.spyOn(console, "log");
+    // Add a dummy function which we can access. On handlers only work on global functions
+    const button = addTestHTML(
+      `<script>window['_testFn']= () => {
+          console.log("works");
+        };</script><div oyc-on:click="_testFn">Click</div>`
+    );
+    button.click();
+
+    await waitFor(() => {
+      expect(button.innerHTML).toBe(`Click`);
+    });
+    expect(fetchSpy).toHaveBeenCalledTimes(0);
+    expect(consoleSpy).toHaveBeenCalledTimes(1);
+    consoleSpy.mockRestore();
+  });
+
   describe("Modifiers", () => {
     // TODO: Fix this to use fake Timers. I get an error on both FF and Chrome
     // Looks like something upstream, we are using the beta version
@@ -83,22 +101,24 @@ describe.shuffle("Core", () => {
     });
     test("Delay", async () => {
       fetchSpy.mockResolvedValueOnce(makeResponse(`Testing delay worked!`));
-  
-      const button = addTestHTML(`<button oyc-get="/test" oyc-trigger="click delay:2s">Delay</button>`);
-      button.click()
-  
+
+      const button = addTestHTML(
+        `<button oyc-get="/test" oyc-trigger="click delay:2s">Delay</button>`
+      );
+      button.click();
+
       expect(fetchSpy).toHaveBeenCalledTimes(0);
       // vi.advanceTimersByTime(2000);
-  
-  
-      await waitFor(() => {
-        expect(button.innerHTML).toBe(`Testing delay worked!`);
-      }, {
-        timeout: 3000
-      });
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
 
+      await waitFor(
+        () => {
+          expect(button.innerHTML).toBe(`Testing delay worked!`);
+        },
+        {
+          timeout: 3000,
+        }
+      );
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
-  })
-  
+  });
 });

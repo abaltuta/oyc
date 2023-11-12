@@ -1,6 +1,7 @@
 import { defineConfig } from "vitest/dist/config";
 
 const testProd = !!process.env.TEST_PROD;
+const coverage = !!process.env.COVERAGE;
 
 export default defineConfig({
   esbuild: false,
@@ -8,21 +9,23 @@ export default defineConfig({
     coverage: {
       all: false,
       include: ["src/**/*"],
-      enabled: !testProd,
-      provider: 'istanbul',
-      reporter: ['text', 'html'],
-      reportsDirectory: 'coverage'
+      enabled: coverage && !testProd,
+      provider: "istanbul",
+      reporter: ["text", "html"],
+      reportsDirectory: "coverage",
     },
     browser: {
       enabled: true,
       headless: !testProd,
-      name: 'firefox'
+      name: "firefox",
     },
-    watch: !testProd
+    watch: !testProd,
   },
   resolve: {
     alias: {
-      '../../src/oyc.js': testProd ? '../../dist/oyc.min.js' : '../../src/oyc.js'
-    }
-  }
+      "../../src/oyc.js": testProd
+        ? "../../dist/oyc.min.js"
+        : "../../src/oyc.js",
+    },
+  },
 });

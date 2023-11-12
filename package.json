@@ -9,6 +9,7 @@
   "scripts": {
     "build": "node ./scripts/build.js",
     "test": "vitest",
+    "test:coverage": "COVERAGE=1 vitest",
     "test:prod": "TEST_PROD=1 vitest"
   },
   "devDependencies": {
