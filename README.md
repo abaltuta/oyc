@@ -10,7 +10,7 @@ If you want to contribute, there's a ton of TODOs scattered throughout the repo.
 
 # Short term goals
 - better define flow and document the process at the beginning of the script
-- processElementsAndChildren when swapping inner html recursively
+- processElementAndChildren when swapping inner html recursively
 - combine `on` attribute handling with general attribute handling
 - add ignore attribute
 - support inputs
@@ -22,6 +22,7 @@ If you want to contribute, there's a ton of TODOs scattered throughout the repo.
 - add support for `withCredentials` when doing a fetch
 - hx-sync-like
 - investigate plugin system
+- process nodes after all have been inserted to avoid any weird selector issues
 - See if we can improve initialization when used inside an ES Module. The problem is reading the on:click functions as they are no longer accessible
 
 # Long term goals
@@ -36,3 +37,7 @@ If you want to contribute, there's a ton of TODOs scattered throughout the repo.
 - package as a ES Module
 - support attributes beginning with both `oyc` and `data-oyc`
 - NO IE 11 Support
+
+# Non-goals
+- 100% test coverage
+- Actually useful software - this is for educational/recreational purposes

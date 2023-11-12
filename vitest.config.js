@@ -5,6 +5,8 @@ const testProd = !!process.env.TEST_PROD;
 export default defineConfig({
   test: {
     coverage: {
+      all: false,
+      include: ["src/**/*"],
       enabled: !testProd,
       provider: 'istanbul',
       reporter: ['text', 'html'],
@@ -12,14 +14,13 @@ export default defineConfig({
     },
     browser: {
       enabled: true,
-      headless: true,
       name: 'firefox'
     },
     watch: !testProd
   },
   resolve: {
     alias: {
-      'oyc': testProd ? './dist/oyc.min.js' : './src/oyc.js'
+      '../../src/oyc.js': testProd ? '../../dist/oyc.min.js' : '../../src/oyc.js'
     }
   }
 });

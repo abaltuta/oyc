@@ -4,7 +4,8 @@ import {
   hasAttribute,
   parseInterval,
 } from "./utils.js";
-//#region Static Data
+
+//#region Static data and initializations
 
 const oycDataAttribute = "oyc-data";
 
@@ -24,6 +25,8 @@ const defaultTrigger = {
   event: "click",
   modifiers: undefined,
 };
+
+const domParser = new DOMParser();
 
 //#endregion
 
@@ -79,7 +82,7 @@ async function handleFetch(method, url, element) {
   });
   if (response.ok) {
     const html = await response.text();
-    swapHTML(element, html);
+    swapInnerHTML(element, html);
   }
 }
 
@@ -87,9 +90,75 @@ async function handleFetch(method, url, element) {
 
 //#region Core
 
-function swapHTML(element, html) {
+/**
+ * Parses an HTML string and returns a document fragment containing the parsed HTML.
+ * @param {string} htmlString - The HTML string to parse.
+ * @param {string} [outputSelector] - Optional CSS selector for selecting a specific element from the parsed HTML.
+ * @returns {DocumentFragment|HTMLElement} - The parsed HTML as a document fragment or a selected element.
+ */
+function parseHTML(htmlString, outputSelector) {
+  // TODO: Support full body refreshes and title changes
+  // We wrap the html string inside a body tag
+  // Looking at the htmx part of the code this appears to avoid some weirdness around parsing `table` tags and friends
+  // TODO: verify this assumption
+  const parsedHTML = domParser.parseFromString(`<body><template>${htmlString}</template></body>`, "text/html");
+
+  if (parseHTML === null) {
+    return document.createDocumentFragment();
+  }
+
+  if (outputSelector) {
+    return parsedHTML.querySelector(outputSelector);
+  }
+
+  return parsedHTML.querySelector('template').content;
+}
+
+function insertBefore(parent, insertBeforeElement, fragment) {
+  while(fragment.childNodes.length > 0) {
+    const child = fragment.firstChild;
+    parent.insertBefore(child, insertBeforeElement);
+    if (child.nodeType !== Node.TEXT_NODE && child.nodeType !== Node.COMMENT_NODE) {
+      // TODO: process this later after all have been inserted because some code may expect all html to exist
+      processElement(child);
+    }
+  }
+}
+
+function swapOuterHTML(targetElement, htmlString) {
+  const fragment = parseHTML(htmlString);
+  const previousSibling = targetElement.previousSibling;
+  insertBefore(targetElement.parentElement, previousSibling, fragment);
+  
+  // Remove the remaining HTML
+  // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this
+  targetElement.remove();
+}
+
+/**
+ * Replaces the HTML content of a target element with new HTML content.
+ * @param {HTMLElement} targetElement - The element whose HTML content will be replaced.
+ * @param {string} htmlString - The new HTML content to replace the old content with.
+ * @returns {void}
+ */
+function swapInnerHTML(targetElement, htmlString) {
   // TODO: Support multiple strategies for swapping HTML
-  element.innerHTML = html;
+  // TODO: Support full body refreshes and title changes
+
+  const fragment = parseHTML(htmlString);
+  const firstChild = targetElement.firstChild;
+  
+  insertBefore(targetElement, firstChild, fragment);
+  
+  // Remove the remaining HTML
+  // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this
+  if (firstChild) {
+    while(firstChild.nextSibling) {
+      targetElement.removeChild(firstChild.nextSibling);
+    }
+    targetElement.removeChild(firstChild);
+    // TODO: Clean up existing elements including event handlers
+  }
 }
 
 function addTriggerHandler(element, listener) {
@@ -368,7 +437,13 @@ function parseTrigger(triggerString) {
 }
 //#endregion
 
+/**
+ * The Oyc instance.
+ * @type {Oyc}
+ */
 export const oyc = new Oyc();
+
+// Don't touch `window` server-side
 if (typeof window !== "undefined") {
   window.oyc = oyc;
 }
