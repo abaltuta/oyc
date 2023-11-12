@@ -3,6 +3,7 @@ import { defineConfig } from "vitest/dist/config";
 const testProd = !!process.env.TEST_PROD;
 
 export default defineConfig({
+  esbuild: false,
   test: {
     coverage: {
       all: false,

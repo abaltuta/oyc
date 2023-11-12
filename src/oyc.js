@@ -347,6 +347,11 @@ function getData(element) {
   return element[oycDataAttribute] || {};
 }
 
+/**
+ * Finds all elements within the given element that match the method selector or the OYC attribute selector.
+ * @param {Element} element - The element to search within.
+ * @returns {NodeList} - A list of matching elements.
+ */
 function findElementsToProcess(element) {
   if (element.querySelectorAll) {
     return element.querySelectorAll(
