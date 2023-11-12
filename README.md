@@ -11,13 +11,13 @@ If you want to contribute, there's a ton of TODOs scattered throughout the repo.
 # Short term goals
 - better define flow and document the process at the beginning of the script
 - clean up elements when deleting them
+- rethink if class is a good idea to keep Oyc's API, we don't really handle state at all
 - combine `on` attribute handling with general attribute handling
 - add ignore attribute
 - support inputs
 - support for forms
-- create test pages and scripts
 - extract types
-- example page
+- complex example page
 - inherited attributes?
 - add support for `withCredentials` when doing a fetch
 - hx-sync-like

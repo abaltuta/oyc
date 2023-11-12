@@ -1,7 +1,7 @@
 import { parseInterval } from "../../src/utils.js";
 import { expect, describe, test } from 'vitest'
 
-describe('Internals', () => {
+describe('Utils', () => {
   describe('Parse Interval', () => {
     test('returns undefined for undefined input', () => {
       expect(parseInterval(undefined)).toBeUndefined();
