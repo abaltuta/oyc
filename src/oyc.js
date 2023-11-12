@@ -56,12 +56,6 @@ export class Oyc {
   }
 }
 
-//#region Fetch
-
-//#endregion
-
-//#region Core
-
 export function processElement(element) {
   for (let index = 0; index < httpMethods.length; index++) {
     if (hasAttribute(element, "oyc-" + httpMethods[index])) {
@@ -163,8 +157,6 @@ function processElementAndChildren(element) {
   // I guess this is why HTMX does it like this too
   addCustomEventListeners(element);
 }
-
-//#endregion
 
 /**
  * The Oyc instance.
