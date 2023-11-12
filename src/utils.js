@@ -61,6 +61,42 @@ export function getAttribute(element, name) {
   return element.getAttribute(name) || element.getAttribute("data-" + name);
 }
 
+const oycDataAttribute = "oyc-data";
+
+// TODO: Figure out a way to type this
+export function getData(element) {
+  // An alternative to just adding this to the element is to use a WeakMap
+  // I'm unsure if that would make any significant difference in performance
+  // This is simpler to add 🤷‍♀️
+  return element[oycDataAttribute] || {};
+}
+
+/**
+ * Converts a time interval string to milliseconds.
+ * @param {string} time - The time interval string.
+ * @returns {number} The time in milliseconds.
+ */
+export function parseInterval(time) {
+  if (time === undefined) {
+    return undefined;
+  }
+
+  let value = parseFloat(time);
+  let unit = time.replace(value, "");
+
+  switch (unit) {
+    case "ms":
+      return value; // milliseconds
+    case "s":
+      return value * 1000; // seconds to milliseconds
+    case "m":
+      return value * 60000; // minutes to milliseconds
+    default:
+      console.warn("[OYC] Invalid time interval: " + time);
+      return undefined;
+  }
+}
+
 /**
  * Adds an event listener to the given element for the specified event.
  * @param {HTMLElement} [element] - The element to add the event listener to. Defaults to the document body.
@@ -104,41 +140,10 @@ export function removeEventListener(element, eventName, listener) {
   element.removeEventListener(eventName, listener);
 }
 
-const oycDataAttribute = "oyc-data";
-
-// TODO: Figure out a way to type this
-export function getData(element) {
-  // An alternative to just adding this to the element is to use a WeakMap
-  // I'm unsure if that would make any significant difference in performance
-  // This is simpler to add 🤷‍♀️
-  return element[oycDataAttribute] || {};
-}
-
-/**
- * Converts a time interval string to milliseconds.
- * @param {string} time - The time interval string.
- * @returns {number} The time in milliseconds.
- */
-export function parseInterval(time) {
-  if (time === undefined) {
-    return undefined;
-  }
-
-  let value = parseFloat(time);
-  let unit = time.replace(value, "");
-
-  switch (unit) {
-    case "ms":
-      return value; // milliseconds
-    case "s":
-      return value * 1000; // seconds to milliseconds
-    case "m":
-      return value * 60000; // minutes to milliseconds
-    default:
-      console.warn("[OYC] Invalid time interval: " + time);
-      return undefined;
-  }
-}
+const _defaultTrigger = {
+  event: "click",
+  modifiers: undefined,
+};
 
 /**
  * @typedef {Object} Modifier
@@ -233,4 +238,12 @@ export function parseTrigger(triggerString) {
     event,
     modifiers,
   };
+}
+
+export function addTriggerHandler(element, listener) {
+  const trigger = {
+    ..._defaultTrigger,
+    ...parseTrigger(getAttribute(element, "oyc-trigger"))
+  }
+  addEventListener(element, trigger.event, listener, trigger.modifiers);
 }

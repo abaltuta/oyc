@@ -2,6 +2,7 @@ import { handleFetch } from "./fetch.js";
 import { httpMethods } from "./static.js";
 import {
   addEventListener,
+  addTriggerHandler,
   findElementsToProcess,
   findOnElements,
   getAttribute,
@@ -10,14 +11,6 @@ import {
   parseTrigger,
   removeEventListener,
 } from "./utils.js";
-
-//#region Static data and initializations
-const defaultTrigger = {
-  event: "click",
-  modifiers: undefined,
-};
-
-//#endregion
 
 export class Oyc {
   ready = document.readyState === "complete";
@@ -65,24 +58,9 @@ export class Oyc {
 
 //#region Fetch
 
-
 //#endregion
 
 //#region Core
-
-function addTriggerHandler(element, listener) {
-  const trigger = parseTrigger(getAttribute(element, "oyc-trigger"));
-  if (trigger) {
-    addEventListener(element, trigger.event, listener, trigger.modifiers);
-  } else {
-    addEventListener(
-      element,
-      defaultTrigger.event,
-      listener,
-      defaultTrigger.modifiers
-    );
-  }
-}
 
 export function processElement(element) {
   for (let index = 0; index < httpMethods.length; index++) {
