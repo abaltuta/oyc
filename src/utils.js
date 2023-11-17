@@ -1,47 +1,49 @@
-import { methodSelector, oycAttributeSelector } from "./static";
+import { methodSelector, oycAttributeSelector } from "./static.js";
 
 /**
  * Finds all elements within the given element that match the method selector or the OYC attribute selector.
  * @param {Element} element - The element to search within.
- * @returns {NodeList} - A list of matching elements.
+ * @returns {NodeListOf<Element>} - A list of matching elements.
  */
 export function findElementsToProcess(element) {
-  if (element.querySelectorAll) {
-    return element.querySelectorAll(
-      methodSelector + "," + oycAttributeSelector
-    );
-  } else {
-    return [];
-  }
+  return element.querySelectorAll(
+    methodSelector + "," + oycAttributeSelector
+  );
 }
-
 
 /**
  * Finds all elements within a given element that have an attribute starting with "oyc-on:" or "data-oyc-on:"
- * @param {HTMLElement}  - The root element to start searching from. Defaults to the entire document.
- * @returns {Array<HTMLElement>} An array of matching nodes
+ * @param {Element} parent - The root element to start searching from. Defaults to the entire document.
+ * @returns {Element[]} An array of matching nodes
  */
 export function findOnElements(parent) {
-  // TODO: Add alternative to evaluate by looping through all the elements and their attributes
+  // TODO: Check for faster alternatives
   const xpathResults = document.evaluate(
     '//*[@*[ starts-with(name(), "oyc-on:") or starts-with(name(), "data-oyc-on:") ]]',
-    parent
+    parent,
+    null,
+    4 // UNORDERED_NODE_ITERATOR_TYPE
   );
 
   let element = null;
   const elements = [];
 
+  /**
+   * To the best of my knowledge, all possible results are Elements.
+   * Here's a list of possible Nodes that are not Elements - none of these can have attributes:
+   * Text, Comment, Document, DocumentFragment
+   */
   while ((element = xpathResults.iterateNext())) {
     elements.push(element);
   }
-  return elements;
+  return /** @type {Element[]} */(elements);
 }
 
 /**
  * Checks if the given element has an attribute with the given name.
  * Also checks for the attribute with the "data-" prefix.
  *
- * @param {HTMLElement} element
+ * @param {Element} element
  * @param {string} name
  * @returns boolean
  */
@@ -53,7 +55,7 @@ export function hasAttribute(element, name) {
  * Gets the value of the given attribute on the given element.
  * Also checks for the attribute with the "data-" prefix.
  *
- * @param {HTMLElement} element
+ * @param {Element} element
  * @param {string} name
  * @returns unknown
  */
@@ -64,6 +66,9 @@ export function getAttribute(element, name) {
 const oycDataAttribute = "oyc-data";
 
 // TODO: Figure out a way to type this
+/**
+ * @param {Node} element
+ */
 export function getData(element) {
   // An alternative to just adding this to the element is to use a WeakMap
   // I'm unsure if that would make any significant difference in performance
@@ -82,7 +87,7 @@ export function parseInterval(time) {
   }
 
   let value = parseFloat(time);
-  let unit = time.replace(value, "");
+  let unit = time.replace(value.toString(), "");
 
   switch (unit) {
     case "ms":
@@ -99,9 +104,9 @@ export function parseInterval(time) {
 
 /**
  * Adds an event listener to the given element for the specified event.
- * @param {HTMLElement} [element] - The element to add the event listener to. Defaults to the document body.
+ * @param {Element} element - The element to add the event listener to. Defaults to the document body.
  * @param {string} eventName - The name of the event to listen for.
- * @param {EventListenerOrEventListenerObject} listener - The listener function to call when the event is triggered.
+ * @param {EventListener} listener - The listener function to call when the event is triggered.
  * @param {Modifier} modifier - The trigger object that describes how to handle the event.
  */
 export function addEventListener(element, eventName, listener, modifier) {
@@ -132,9 +137,9 @@ export function addEventListener(element, eventName, listener, modifier) {
 
 /**
  * Removes an event listener from the specified element.
- * @param {HTMLElement} [element] - The element to remove the event listener from.
+ * @param {Element} element - The element to remove the event listener from.
  * @param {string} eventName - The name of the event.
- * @param {EventListenerOrEventListenerObject} listener - The callback function to remove.
+ * @param {EventListener} listener - The callback function to remove.
  */
 export function removeEventListener(element, eventName, listener) {
   element.removeEventListener(eventName, listener);
@@ -147,14 +152,14 @@ const _defaultTrigger = {
 
 /**
  * @typedef {Object} Modifier
- * @property {boolean} once
- * @property {boolean} prevent
- * @property {string} delay
- * @property {string} throttle
- * @property {string} debounce
- * @property {boolean} capture
- * @property {boolean} passive
- * @property {string} from
+ * @property {boolean} [once]
+ * @property {boolean} [prevent]
+ * @property {number} [delay]
+ * @property {number} [throttle]
+ * @property {number} [debounce]
+ * @property {boolean} [capture]
+ * @property {boolean} [passive]
+ * @property {string} [from]
  */
 
 /**
@@ -240,10 +245,14 @@ export function parseTrigger(triggerString) {
   };
 }
 
-export function addTriggerHandler(element, listener) {
+/**
+ * @param {Element} element
+ * @param {EventListener} listener
+ */
+export function parseAndAddTriggerHandler(element, listener) {
   const trigger = {
     ..._defaultTrigger,
-    ...parseTrigger(getAttribute(element, "oyc-trigger"))
-  }
+    ...parseTrigger(getAttribute(element, "oyc-trigger")),
+  };
   addEventListener(element, trigger.event, listener, trigger.modifiers);
 }

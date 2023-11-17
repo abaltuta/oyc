@@ -6,7 +6,7 @@ const domParser = new DOMParser();
  * Parses an HTML string and returns a document fragment containing the parsed HTML.
  * @param {string} htmlString - The HTML string to parse.
  * @param {string} [outputSelector] - Optional CSS selector for selecting a specific element from the parsed HTML.
- * @returns {DocumentFragment} - The parsed HTML as a document fragment or a selected element.
+ * @returns {DocumentFragment | Element} - The parsed HTML as a document fragment or a selected element.
  */
 export function parseHTML(htmlString, outputSelector) {
   // TODO: Support full body refreshes and title changes
@@ -29,21 +29,21 @@ export function parseHTML(htmlString, outputSelector) {
 
 /**
  * Inserts a fragment of HTML elements before a specified element in the DOM tree.
- * @param {Node} parent - The parent element where the fragment will be inserted.
- * @param {Node} insertBeforeElement - The element before which the fragment will be inserted.
- * @param {DocumentFragment} fragment - The fragment of HTML elements to be inserted.
+ * @param {Element} parent - The parent element where the fragment will be inserted.
+ * @param {Node} insertBeforeNode - The element before which the fragment will be inserted.
+ * @param {DocumentFragment | Element} fragment - The fragment of HTML elements to be inserted.
  * @returns {void}
  */
-function insertBefore(parent, insertBeforeElement, fragment) {
+function insertBefore(parent, insertBeforeNode, fragment) {
   while (fragment.childNodes.length > 0) {
     const child = fragment.firstChild;
-    parent.insertBefore(child, insertBeforeElement);
+    parent.insertBefore(child, insertBeforeNode);
     if (
-      child.nodeType !== Node.TEXT_NODE &&
-      child.nodeType !== Node.COMMENT_NODE
+      child.nodeType === Node.ELEMENT_NODE
     ) {
       // TODO: process this later after all have been inserted because some code may expect all html to exist
-      processElement(child);
+      // This type assertion is safe because of the check above
+      processElement(/** @type Element*/(child));
     }
   }
 }
@@ -51,7 +51,7 @@ function insertBefore(parent, insertBeforeElement, fragment) {
 /**
  * Replaces the outer HTML of a target element with the provided HTML string.
  *
- * @param {HTMLElement} targetElement - The target element whose outer HTML needs to be replaced.
+ * @param {Element} targetElement - The target element whose outer HTML needs to be replaced.
  * @param {string} htmlString - The HTML string to replace the outer HTML of the target element.
  * @returns {void}
  */
@@ -67,7 +67,7 @@ export function swapOuterHTML(targetElement, htmlString) {
 
 /**
  * Replaces the HTML content of a target element with new HTML content.
- * @param {HTMLElement} targetElement - The element whose HTML content will be replaced.
+ * @param {Element} targetElement - The element whose HTML content will be replaced.
  * @param {string} htmlString - The new HTML content to replace the old content with.
  * @returns {void}
  */

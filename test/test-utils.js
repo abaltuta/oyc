@@ -45,7 +45,7 @@ export function clearTestArea() {
 
 /**
  * Returns the test area element.
- * @returns {HTMLElement} The test area element.
+ * @returns {Element} The test area element.
  * @throws {Error} If no test area element is found.
  */
 export function getTestArea() {
@@ -59,7 +59,7 @@ export function getTestArea() {
 /**
  * Adds HTML to the test area and processes it with OYC.
  * @param {string} html - The HTML to add to the test area.
- * @returns {HTMLElement} - The last processed child element.
+ * @returns {Element} - The last processed child element.
  */
 export function addTestHTML(html) {
   const fragment = document.createRange().createContextualFragment(html);

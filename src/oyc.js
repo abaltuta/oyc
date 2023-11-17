@@ -1,13 +1,10 @@
-import { handleFetch } from "./fetch.js";
-import { httpMethods } from "./static.js";
+import { processHTTPAttributes } from "./attributes.js";
 import {
   addEventListener,
-  addTriggerHandler,
   findElementsToProcess,
   findOnElements,
   getAttribute,
   getData,
-  hasAttribute,
   parseTrigger,
   removeEventListener,
 } from "./utils.js";
@@ -23,6 +20,7 @@ export class Oyc {
     // Are we already loaded? This shouldn't happen since we recomment loading this script as a module
     if (this.ready == false) {
       document.addEventListener("readystatechange", (event) => {
+        // @ts-ignore - this is dumb - see https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/969#issuecomment-784344870
         if (event.target.readyState === "complete") {
           this.ready = true;
         }
@@ -48,6 +46,7 @@ export class Oyc {
       fn();
     } else {
       document.addEventListener("readystatechange", (event) => {
+        // @ts-ignore - this is dumb - see https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/969#issuecomment-784344870
         if (event.target.readyState === "complete") {
           fn();
         }
@@ -56,22 +55,18 @@ export class Oyc {
   }
 }
 
+/**
+ * @param {Element} element
+ */
 export function processElement(element) {
-  for (let index = 0; index < httpMethods.length; index++) {
-    if (hasAttribute(element, "oyc-" + httpMethods[index])) {
-      addTriggerHandler(element, function (event) {
-        // TODO: Disable this element's processing while the request is in progress
-        // add a boolean to the element?
-        void handleFetch(
-          httpMethods[index],
-          getAttribute(element, "oyc-" + httpMethods[index]),
-          event.target
-        );
-      });
-    }
-  }
+
+  // Process HTTP Attributes
+  processHTTPAttributes(element);
 }
 
+/**
+ * @param {Element} element
+ */
 function addCustomEventListeners(element) {
   // Remove existing custom listeners, diffing them would be too much of a pain.
   removeCustomEventListeners(element);
@@ -123,6 +118,7 @@ function removeCustomEventListeners(element) {
   const data = getData(element);
   if (data.onEventHandlers) {
     for (let index = 0; index < data.onHandlers.length; index++) {
+      const handler = data.onHandlers[index];
       // We do this manually instead of our wrapper since this is marginally faster
       element.removeEventListener(handler.event, handler.listener);
     }
@@ -137,7 +133,7 @@ function removeCustomEventListeners(element) {
  * This means:
  *    - Add event listeners
  *
- * @param {HTMLElement} element
+ * @param {Element} element
  */
 function processElementAndChildren(element) {
   // TODO: Add extra initialization for node like data

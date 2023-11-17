@@ -1,6 +1,11 @@
-import { swapInnerHTML } from "./dom";
+import { swapInnerHTML } from "./dom.js";
 
-export async function handleFetch(method, url, element) {
+/**
+ * @param {string} method
+ * @param {RequestInfo | URL} url
+ * @param {Element} swapTarget
+ */
+export async function handleFetch(method, url, swapTarget) {
   // TODO: handle multiple swap types
   const response = await fetch(url, {
     method: method.toUpperCase(),
@@ -8,6 +13,6 @@ export async function handleFetch(method, url, element) {
 
   if (response.ok) {
     const html = await response.text();
-    swapInnerHTML(element, html);
+    swapInnerHTML(swapTarget, html);
   }
 }
