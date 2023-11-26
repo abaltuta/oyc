@@ -4,6 +4,7 @@ import { writeFileSync } from 'fs';
 esbuild.build({
   entryPoints: ["./src/oyc.js"],
   bundle: true,
+  sourcemap: 'external',
   minify: true,
   metafile: true,
   format: "esm",

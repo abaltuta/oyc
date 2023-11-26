@@ -1,7 +1,7 @@
 import { processHTTPAttributes } from "./attributes.js";
 import {
   addEventListener,
-  findElementsToProcess,
+  findOycChildren,
   findOnElements,
   getAttribute,
   getData,
@@ -19,9 +19,8 @@ export class Oyc {
   constructor() {
     // Are we already loaded? This shouldn't happen since we recomment loading this script as a module
     if (this.ready == false) {
-      document.addEventListener("readystatechange", (event) => {
-        // @ts-ignore - this is dumb - see https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/969#issuecomment-784344870
-        if (event.target.readyState === "complete") {
+      document.addEventListener("readystatechange", () => {
+        if (document.readyState === "complete") {
           this.ready = true;
         }
       });
@@ -45,9 +44,8 @@ export class Oyc {
     if (this.ready) {
       fn();
     } else {
-      document.addEventListener("readystatechange", (event) => {
-        // @ts-ignore - this is dumb - see https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/969#issuecomment-784344870
-        if (event.target.readyState === "complete") {
+      document.addEventListener("readystatechange", () => {
+        if (document.readyState === "complete") {
           fn();
         }
       });
@@ -56,29 +54,35 @@ export class Oyc {
 }
 
 /**
+ * Adds OYC specific listeners
+ * 
+ * Note: this doesn't handle `oyc-on`. If you want that behavior please use `processElementAndChildren`
+ * or `addCustomEventListeners`
+ * This is because that uses a totally different selction mechanism
+ * 
  * @param {Element} element
  */
 export function processElement(element) {
-
   // Process HTTP Attributes
   processHTTPAttributes(element);
 }
 
 /**
+ * Adds all custom event handlers on an element and its children
+ * Ex: 
+ * - oyc-on:click="topLevelFunctionName"
+ * - oyc-on:click="topLevelFunctionName" oyc-trigger="click delay:2s"
+ * 
  * @param {Element} element
  */
 function addCustomEventListeners(element) {
-  // Remove existing custom listeners, diffing them would be too much of a pain.
-  removeCustomEventListeners(element);
-
   /**
    * Find all the elements and add event handlers.
-   * Keep a reference in `onEventHandlers` so we can remove them later.
    */
-  findOnElements(element).forEach((element) => {
-    const data = getData(element);
-    // TODO: Type this somehow in jsdoc
-    data.onEventHandlers = [];
+  const elements = findOnElements(element);
+  for (let index = 0; index < elements.length; index++) {
+    const element = elements[index];
+
     for (let index = 0; index < element.attributes.length; index++) {
       const attribute = element.attributes[index];
       if (
@@ -103,39 +107,22 @@ function addCustomEventListeners(element) {
             trigger.modifiers
           );
         } else {
-          addEventListener(element, event, window[listener], undefined);
+          addEventListener(element, event, window[listener]);
         }
-        data.onEventHandlers.push({
-          event,
-          listener,
-        });
       }
     }
-  });
-}
-
-function removeCustomEventListeners(element) {
-  const data = getData(element);
-  if (data.onEventHandlers) {
-    for (let index = 0; index < data.onHandlers.length; index++) {
-      const handler = data.onHandlers[index];
-      // We do this manually instead of our wrapper since this is marginally faster
-      element.removeEventListener(handler.event, handler.listener);
-    }
-
-    // Clean up `onEventHandlers`
-    delete data.onEventHandlers;
   }
 }
 
 /**
  * Process the given element and its children.
  * This means:
- *    - Add event listeners
+ *    - Add custom event listeres
+ *    - Add HTTP event listeners
  *
  * @param {Element} element
  */
-function processElementAndChildren(element) {
+export function processElementAndChildren(element) {
   // TODO: Add extra initialization for node like data
   // TODO: Add hook for custom initialization per-node
 
@@ -143,14 +130,11 @@ function processElementAndChildren(element) {
   // This may not be needed if we keep a hash of custom listeners
   processElement(element);
 
-  const children = findElementsToProcess(element);
+  const children = findOycChildren(element);
   for (let i = 0; i < children.length; i++) {
     processElement(children[i]);
   }
-
-  // These should supercede the method listeners set above
-  // Alternatively: We can process these as we process the children but the selector becomes more complex
-  // I guess this is why HTMX does it like this too
+  
   addCustomEventListeners(element);
 }
 

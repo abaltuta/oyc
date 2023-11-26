@@ -8,15 +8,26 @@ Don't expect much. There's an `index.html` which has a very small example. There
 
 If you want to contribute, there's a ton of TODOs scattered throughout the repo.
 
+# Basic logic
+
+Processing means:
+ - add http events
+ - add "on:" events
+
+When swapping
+ - parse HTML into fragment
+ - add http events
+ - add "on:" events
+ - append fragment to destination
+ - remove existing elements if needed
+
+
 # Short term goals
-- better define flow and document the process at the beginning of the script
-- clean up elements when deleting them
-- rethink if class is a good idea to keep Oyc's API, we don't really handle state at all
 - combine `on` attribute handling with general attribute handling
+- rethink if class is a good idea to keep Oyc's API, we don't really handle state at all
 - add ignore attribute
 - support inputs
 - support for forms
-- extract types
 - complex example page
 - inherited attributes?
 - add support for `withCredentials` when doing a fetch
@@ -29,9 +40,11 @@ If you want to contribute, there's a ton of TODOs scattered throughout the repo.
 - Define custom headers that change functionality
 - Logger
 - Define specs for optional server responses
+- Showcase educational benchmarks that led to decisions being made
 
 # Self-imposed limitations
 - modern JS wherever possible (fetch, intersection observer)
+- do not support `eval` to be as CSP friendly
 - try to reduce the amount of object creation
 - try to store as much information as possible in the element itself.
 - package as a ES Module

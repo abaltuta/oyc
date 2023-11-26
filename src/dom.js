@@ -1,4 +1,4 @@
-import { processElement } from "./oyc.js";
+import { processElementAndChildren } from "./oyc.js";
 // We reuse the DOMParser instead of creating a new one
 const domParser = new DOMParser();
 
@@ -43,7 +43,7 @@ function insertBefore(parent, insertBeforeNode, fragment) {
     ) {
       // TODO: process this later after all have been inserted because some code may expect all html to exist
       // This type assertion is safe because of the check above
-      processElement(/** @type Element*/(child));
+      processElementAndChildren(/** @type Element*/(child));
     }
   }
 }

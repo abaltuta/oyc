@@ -2,11 +2,11 @@ import { methodSelector, oycAttributeSelector } from "./static.js";
 
 /**
  * Finds all elements within the given element that match the method selector or the OYC attribute selector.
- * @param {Element} element - The element to search within.
+ * @param {Element} parent - The element to search within.
  * @returns {NodeListOf<Element>} - A list of matching elements.
  */
-export function findElementsToProcess(element) {
-  return element.querySelectorAll(
+export function findOycChildren(parent) {
+  return parent.querySelectorAll(
     methodSelector + "," + oycAttributeSelector
   );
 }
@@ -107,7 +107,7 @@ export function parseInterval(time) {
  * @param {Element} element - The element to add the event listener to. Defaults to the document body.
  * @param {string} eventName - The name of the event to listen for.
  * @param {EventListener} listener - The listener function to call when the event is triggered.
- * @param {Modifier} modifier - The trigger object that describes how to handle the event.
+ * @param {Modifier} [modifier] - The trigger object that describes how to handle the event.
  */
 export function addEventListener(element, eventName, listener, modifier) {
   if (!modifier || Object.keys(modifier).length === 0) {
@@ -116,7 +116,7 @@ export function addEventListener(element, eventName, listener, modifier) {
   }
 
   // If there is a modifier then wrap the listener function
-  const listenerWrapper = function (event) {
+  const listenerWrapper = function (/** @type {Event} */ event) {
     if (modifier.delay) {
       setTimeout(() => {
         listener(event);
