@@ -23,8 +23,8 @@ When swapping
 
 
 # Short term goals
-- combine `on` attribute handling with general attribute handling
 - rethink if class is a good idea to keep Oyc's API, we don't really handle state at all
+- investigate plugin system
 - add ignore attribute
 - support inputs
 - support for forms
@@ -32,7 +32,6 @@ When swapping
 - inherited attributes?
 - add support for `withCredentials` when doing a fetch
 - hx-sync-like
-- investigate plugin system
 - process nodes after all have been inserted to avoid any weird selector issues
 - See if we can improve initialization when used inside an ES Module. The problem is reading the on:click functions as they are no longer accessible
 

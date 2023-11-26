@@ -4,8 +4,10 @@ export const methodSelector = httpMethods
   .flatMap((method) => [`[oyc-${method}]`, `[data-oyc-${method}]`])
   .join(",");
 
-export const oycAttributes = ["trigger"];
+export const ignoreAttribute = "oyc-ignore";
+
+export const oycAttributes = ["oyc-trigger"];
 
 export const oycAttributeSelector = oycAttributes
-  .flatMap((attribute) => [`[oyc-${attribute}]`, `[data-oyc-${attribute}]`])
+  .flatMap((attribute) => [`[${attribute}]`, `[data-${attribute}]`])
   .join(",");

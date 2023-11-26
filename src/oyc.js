@@ -1,4 +1,5 @@
 import { processHTTPAttributes } from "./attributes.js";
+import { ignoreAttribute } from "./static.js";
 import {
   addEventListener,
   findOycChildren,
@@ -126,6 +127,9 @@ export function processElementAndChildren(element) {
   // TODO: Add extra initialization for node like data
   // TODO: Add hook for custom initialization per-node
 
+  if (getAttribute(element, ignoreAttribute)) {
+    return;
+  }
   // Remove existing event listeners
   // This may not be needed if we keep a hash of custom listeners
   processElement(element);

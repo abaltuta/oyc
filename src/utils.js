@@ -11,6 +11,9 @@ export function findOycChildren(parent) {
   );
 }
 
+
+const onElementExpression = new XPathEvaluator().createExpression('//*[@*[ starts-with(name(), "oyc-on:") or starts-with(name(), "data-oyc-on:") ] and not(@oyc-ignore) and not(@data-oyc-ignore)]');
+
 /**
  * Finds all elements within a given element that have an attribute starting with "oyc-on:" or "data-oyc-on:"
  * @param {Element} parent - The root element to start searching from. Defaults to the entire document.
@@ -18,10 +21,8 @@ export function findOycChildren(parent) {
  */
 export function findOnElements(parent) {
   // TODO: Check for faster alternatives
-  const xpathResults = document.evaluate(
-    '//*[@*[ starts-with(name(), "oyc-on:") or starts-with(name(), "data-oyc-on:") ]]',
+  const xpathResults = onElementExpression.evaluate(
     parent,
-    null,
     4 // UNORDERED_NODE_ITERATOR_TYPE
   );
 
