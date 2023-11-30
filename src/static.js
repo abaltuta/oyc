@@ -6,7 +6,7 @@ export const methodSelector = httpMethods
 
 export const ignoreAttribute = "oyc-ignore";
 
-export const oycAttributes = ["oyc-trigger"];
+export const oycAttributes = ["oyc-trigger", "oyc-class"];
 
 export const oycAttributeSelector = oycAttributes
   .flatMap((attribute) => [`[${attribute}]`, `[data-${attribute}]`])

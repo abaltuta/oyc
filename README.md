@@ -23,13 +23,16 @@ When swapping
 
 
 # Short term goals
-- rethink if class is a good idea to keep Oyc's API, we don't really handle state at all
 - investigate plugin system
+- add logger
+- helpers for toggling a class
 - add ignore attribute
+- rethink if class is a good idea to keep Oyc's API, we don't really handle state at all
 - support inputs
 - support for forms
 - complex example page
 - inherited attributes?
+- remove accepting `data-` attributes stick to just oyc's, but allow the prefix to be changed to whatever the user wants
 - add support for `withCredentials` when doing a fetch
 - hx-sync-like
 - process nodes after all have been inserted to avoid any weird selector issues

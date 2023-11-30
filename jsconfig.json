@@ -3,6 +3,9 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "checkJs": true,
+    "paths": {
+      "oyc": ["./src/oyc.js"]
+    }
   },
   "include": ["src/**/*", ],
   "exclude": ["node_modules", "**/node_modules/*"]

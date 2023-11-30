@@ -10,6 +10,10 @@ import {
   removeEventListener,
 } from "./utils.js";
 
+// Reexport some utils for plugins
+// TODO: Reexport more
+export { parseInterval } from './utils.js';
+
 export class Oyc {
   ready = document.readyState === "complete";
   on = addEventListener;
@@ -139,6 +143,7 @@ export function processElementAndChildren(element) {
     processElement(children[i]);
   }
   
+  // It may be worth moving this inside processElement, but here the selector is very different
   addCustomEventListeners(element);
 }
 

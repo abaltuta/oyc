@@ -247,6 +247,8 @@ export function parseTrigger(triggerString) {
 }
 
 /**
+ * This function's only claim to fame is that it merges `defaultTrigger`
+ * 
  * @param {Element} element
  * @param {EventListener} listener
  */
