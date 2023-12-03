@@ -32,20 +32,11 @@ export function parseHTML(htmlString, outputSelector) {
  * @param {Element} parent - The parent node where the fragment will be inserted.
  * @param {Node} insertBeforeNode - The node before which the fragment will be inserted.
  * @param {DocumentFragment | Element} fragment - The fragment of DOM nodes to be inserted.
- * @param {Function} onProcess - The callback function to be called on each inserted element node.
  * @returns {void}
  */
-function insertBefore(parent, insertBeforeNode, fragment, onProcess) {
+function insertBefore(parent, insertBeforeNode, fragment) {
   while (fragment.childNodes.length > 0) {
-    const child = fragment.firstChild;
-    parent.insertBefore(child, insertBeforeNode);
-    if (
-      child.nodeType === Node.ELEMENT_NODE
-    ) {
-      // TODO: process this later after all have been inserted because some code may expect all html to exist
-      // This type assertion is safe because of the check above
-      onProcess(/** @type Element*/ (child));
-    }
+    parent.insertBefore(fragment.firstChild, insertBeforeNode);
   }
 }
 
@@ -60,7 +51,7 @@ function insertBefore(parent, insertBeforeNode, fragment, onProcess) {
 export function swapOuterHTML(targetElement, htmlString, onProcess) {
   const fragment = parseHTML(htmlString);
   const previousSibling = targetElement.previousSibling;
-  insertBefore(targetElement.parentElement, previousSibling, fragment, onProcess);
+  insertBefore(targetElement.parentElement, previousSibling, fragment);
 
   // Remove the remaining HTML
   // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this
@@ -71,25 +62,42 @@ export function swapOuterHTML(targetElement, htmlString, onProcess) {
  * Replaces the HTML content of a target element with new HTML content.
  * @param {Element} targetElement - The element whose HTML content will be replaced.
  * @param {string} htmlString - The new HTML content to replace the old content with.
- * @param {Function} onProcess - The callback function to be called on each inserted element node.
+ * @param {(element: ChildNode) => void} onProcess - The callback function to be called on each inserted element node.
  * @returns {void}
  */
 export function swapInnerHTML(targetElement, htmlString, onProcess) {
-  // TODO: Support multiple strategies for swapping HTML
   // TODO: Support full body refreshes and title changes
 
   const fragment = parseHTML(htmlString);
   const firstChild = targetElement.firstChild;
+  const initialCount = targetElement.childElementCount;
 
-  insertBefore(targetElement, firstChild, fragment, onProcess);
+  /**
+   * We could clear the count before appending, but if something goes wrong,
+   * it probably looks worse. Willing to change this behavior.
+   * It would probably be simpler to just clear the parent
+   */
 
-  // Remove the remaining HTML
-  // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this
+  insertBefore(targetElement, firstChild, fragment);
+
   if (firstChild) {
-    while (firstChild.nextSibling) {
-      targetElement.removeChild(firstChild.nextSibling);
+    let prevSibling = firstChild.previousSibling
+    while (prevSibling) {
+      onProcess(prevSibling);
+      prevSibling = prevSibling.previousSibling;
     }
-    targetElement.removeChild(firstChild);
-    // TODO: Clean up existing elements including event handlers
   }
+
+  if (initialCount > 1 ){
+    // Delete Contents doesn't work on a collapsed range.
+    // A collapsed range is when the start and end are the same.
+    // So we check if there are more than 1 children.
+    const range = document.createRange();
+    range.setStart(firstChild, 0);
+    range.setEnd(targetElement.lastChild, 0);
+    range.deleteContents();
+  } else {
+    firstChild.remove();
+  }
+
 }

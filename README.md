@@ -23,20 +23,17 @@ When swapping
 
 
 # Short term goals
-- investigate plugin system
+- process nodes after all have been inserted to avoid any weird selector issues
 - move methods to private methods
 - add logger
-- helpers for toggling a class
-- add ignore attribute
+- multiple swap strategies
 - support inputs
 - support for forms
 - complex example page
 - overhaul tests
 - inherited attributes?
-- remove accepting `data-` attributes stick to just oyc's, but allow the prefix to be changed to whatever the user wants
 - add support for `withCredentials` when doing a fetch
 - hx-sync-like
-- process nodes after all have been inserted to avoid any weird selector issues
 - See if we can improve initialization when used inside an ES Module. The problem is reading the on:click functions as they are no longer accessible
 - Server-side HMR helper
 

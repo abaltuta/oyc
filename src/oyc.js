@@ -148,7 +148,7 @@ export class Oyc {
     // TODO: Add extra initialization for node like data
     // TODO: Add hook for custom initialization per-node
 
-    if (element.getAttribute(ignoreAttribute)) {
+    if (element.nodeType !== Node.ELEMENT_NODE || element.getAttribute(ignoreAttribute)) {
       return;
     }
 

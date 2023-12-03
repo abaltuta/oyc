@@ -35,8 +35,6 @@ describe("fetch", () => {
     await waitFor(() => {
       expect(element.innerHTML).toBe(responseText);
     });
-
-    expect(element.innerHTML).toBe(responseText);
   });
 
   test("does not swap innerHTML of element on failed fetch", async () => {
