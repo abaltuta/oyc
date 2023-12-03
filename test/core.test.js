@@ -6,11 +6,24 @@ import {
   makeTestArea,
 } from "./test-utils.js";
 import { screen, waitFor } from "@testing-library/dom";
-import { afterAll } from "vitest";
-import { beforeAll } from "vitest";
-import { beforeEach, afterEach, expect, describe, test, vi } from "vitest";
+import {
+  beforeAll,
+  beforeEach,
+  afterEach,
+  afterAll,
+  expect,
+  describe,
+  test,
+  vi,
+} from "vitest";
+
+import { Oyc } from "oyc";
 
 describe("Core", () => {
+  let oyc;
+  beforeAll(() => {
+    oyc = new Oyc();
+  });
   /**
    * @type {SpyInstance<ReturnType<WindowOrWorkerGlobalScope["fetch"]>>}
    */
@@ -30,7 +43,8 @@ describe("Core", () => {
     for (const method of methodVerbs) {
       fetchSpy.mockResolvedValueOnce(makeResponse(`Testing ${method} worked!`));
       const button = addTestHTML(
-        `<button oyc-${method}="/test">Testing ${method}</button>`
+        `<button oyc-${method}="/test">Testing ${method}</button>`,
+        oyc
       );
       button.click();
 
@@ -55,8 +69,10 @@ describe("Core", () => {
       );
 
     const button = addTestHTML(
-      `<div>Should exist</div><button oyc-get="/test">Level 0</button>`
+      `<div>Should exist</div><button oyc-get="/test">Level 0</button>`,
+      oyc
     );
+
     button.click();
 
     const level1 = await screen.findByText("Level 1");
@@ -73,12 +89,13 @@ describe("Core", () => {
   });
 
   test("On event handlers", async () => {
-    const consoleSpy = vi.spyOn(console, "log");
+    const consoleSpy = vi.spyOn(console, "info");
     // Add a dummy function which we can access. On handlers only work on global functions
     const button = addTestHTML(
       `<script>window['_testFn']= () => {
-          console.log("works");
-        };</script><div oyc-on:click="_testFn">Click</div>`
+          console.info("works");
+        };</script><div oyc-on:click="_testFn">Click</div>`,
+      oyc
     );
     button.click();
 
@@ -91,35 +108,27 @@ describe("Core", () => {
   });
 
   describe("Modifiers", () => {
-    // Looks like something upstream, we are using the beta version
     beforeAll(() => {
-      vi.useFakeTimers({
-        // by default vitest attempts to patch `setImmediate` this doesn't exist in most browsers apart from old versions of Edge
-        // We pass in what we want to fake manually to avoid this issue. We don't need the whole api faked anyway
-        toFake: ["setTimeout"]
-      });
+      vi.useFakeTimers();
     });
     afterAll(() => {
       vi.useRealTimers();
-    })
+    });
     test("Delay", async () => {
-      vi.useFakeTimers();
-
       fetchSpy.mockResolvedValueOnce(makeResponse(`Testing delay worked!`));
 
       const button = addTestHTML(
-        `<button oyc-get="/test" oyc-trigger="click delay:2s">Delay</button>`
+        `<button oyc-get="/test" oyc-trigger="click delay:2s">Delay</button>`,
+        oyc
       );
       button.click();
 
       expect(fetchSpy).toHaveBeenCalledTimes(0);
       vi.advanceTimersByTime(2000);
 
-      await waitFor(
-        () => {
-          expect(button.innerHTML).toBe(`Testing delay worked!`);
-        }
-      );
+      await waitFor(() => {
+        expect(button.innerHTML).toBe(`Testing delay worked!`);
+      });
       expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });

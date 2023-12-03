@@ -1,69 +1,3 @@
-import { methodSelector, oycAttributeSelector } from "./static.js";
-
-/**
- * Finds all elements within the given element that match the method selector or the OYC attribute selector.
- * @param {Element} parent - The element to search within.
- * @returns {NodeListOf<Element>} - A list of matching elements.
- */
-export function findOycChildren(parent) {
-  return parent.querySelectorAll(
-    methodSelector + "," + oycAttributeSelector
-  );
-}
-
-
-const onElementExpression = new XPathEvaluator().createExpression('//*[@*[ starts-with(name(), "oyc-on:") or starts-with(name(), "data-oyc-on:") ] and not(@oyc-ignore) and not(@data-oyc-ignore)]');
-
-/**
- * Finds all elements within a given element that have an attribute starting with "oyc-on:" or "data-oyc-on:"
- * @param {Element} parent - The root element to start searching from. Defaults to the entire document.
- * @returns {Element[]} An array of matching nodes
- */
-export function findOnElements(parent) {
-  // TODO: Check for faster alternatives
-  const xpathResults = onElementExpression.evaluate(
-    parent,
-    4 // UNORDERED_NODE_ITERATOR_TYPE
-  );
-
-  let element = null;
-  const elements = [];
-
-  /**
-   * To the best of my knowledge, all possible results are Elements.
-   * Here's a list of possible Nodes that are not Elements - none of these can have attributes:
-   * Text, Comment, Document, DocumentFragment
-   */
-  while ((element = xpathResults.iterateNext())) {
-    elements.push(element);
-  }
-  return /** @type {Element[]} */(elements);
-}
-
-/**
- * Checks if the given element has an attribute with the given name.
- * Also checks for the attribute with the "data-" prefix.
- *
- * @param {Element} element
- * @param {string} name
- * @returns boolean
- */
-export function hasAttribute(element, name) {
-  return element.hasAttribute(name) || element.hasAttribute("data-" + name);
-}
-
-/**
- * Gets the value of the given attribute on the given element.
- * Also checks for the attribute with the "data-" prefix.
- *
- * @param {Element} element
- * @param {string} name
- * @returns unknown
- */
-export function getAttribute(element, name) {
-  return element.getAttribute(name) || element.getAttribute("data-" + name);
-}
-
 const oycDataAttribute = "oyc-data";
 
 // TODO: Figure out a way to type this
@@ -117,7 +51,7 @@ export function addEventListener(element, eventName, listener, modifier) {
   }
 
   // If there is a modifier then wrap the listener function
-  const listenerWrapper = function (/** @type {Event} */ event) {
+  const listenerWrapper = function(/** @type {Event} */ event) {
     if (modifier.delay) {
       setTimeout(() => {
         listener(event);
@@ -248,14 +182,14 @@ export function parseTrigger(triggerString) {
 
 /**
  * This function's only claim to fame is that it merges `defaultTrigger`
- * 
+ *
  * @param {Element} element
  * @param {EventListener} listener
  */
 export function parseAndAddTriggerHandler(element, listener) {
   const trigger = {
     ..._defaultTrigger,
-    ...parseTrigger(getAttribute(element, "oyc-trigger")),
+    ...parseTrigger(element.getAttribute("oyc-trigger")),
   };
   addEventListener(element, trigger.event, listener, trigger.modifiers);
 }

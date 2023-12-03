@@ -24,19 +24,21 @@ When swapping
 
 # Short term goals
 - investigate plugin system
+- move methods to private methods
 - add logger
 - helpers for toggling a class
 - add ignore attribute
-- rethink if class is a good idea to keep Oyc's API, we don't really handle state at all
 - support inputs
 - support for forms
 - complex example page
+- overhaul tests
 - inherited attributes?
 - remove accepting `data-` attributes stick to just oyc's, but allow the prefix to be changed to whatever the user wants
 - add support for `withCredentials` when doing a fetch
 - hx-sync-like
 - process nodes after all have been inserted to avoid any weird selector issues
 - See if we can improve initialization when used inside an ES Module. The problem is reading the on:click functions as they are no longer accessible
+- Server-side HMR helper
 
 # Long term goals
 - Define custom headers that change functionality

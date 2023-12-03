@@ -1,5 +1,5 @@
+import { describe, expect, test } from "vitest";
 import { parseHTML } from "../src/dom.js";
-import { describe, test, expect } from "vitest";
 
 describe("parseHTML", () => {
   test("parses HTML string into document fragment", () => {

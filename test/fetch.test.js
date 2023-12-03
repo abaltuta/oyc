@@ -1,13 +1,11 @@
-import { handleFetch } from "../src/fetch.js";
-import { beforeEach, afterEach, describe, test, expect, vi } from "vitest";
-import {
-  addTestHTML,
-  clearTestArea,
-  makeResponse,
-  makeTestArea,
-} from "./test-utils.js";
+import { waitFor } from "@testing-library/dom";
+import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { addTestHTML, clearTestArea, makeResponse, makeTestArea } from "./test-utils.js";
+
+import { Oyc } from "oyc";
 
 describe("fetch", () => {
+  let oyc;
   /**
    * @type {SpyInstance<ReturnType<WindowOrWorkerGlobalScope["fetch"]>>}
    */
@@ -20,13 +18,23 @@ describe("fetch", () => {
     clearTestArea();
     vi.restoreAllMocks();
   });
+  beforeAll(() => {
+    oyc = new Oyc();
+  });
 
   test("swaps innerHTML of element with response text on successful fetch", async () => {
     const responseText = "<div>New content</div>";
     fetchSpy.mockResolvedValueOnce(makeResponse(responseText));
-    const element = addTestHTML("<p>Initial content</p>");
+    const element = addTestHTML(
+      "<p oyc-get='/some-url'>Initial content</p>",
+      oyc,
+    );
 
-    await handleFetch("get", "/some-url", element);
+    element.click();
+
+    await waitFor(() => {
+      expect(element.innerHTML).toBe(responseText);
+    });
 
     expect(element.innerHTML).toBe(responseText);
   });
@@ -34,10 +42,15 @@ describe("fetch", () => {
   test("does not swap innerHTML of element on failed fetch", async () => {
     const responseText = "<div>New content</div>";
     fetchSpy.mockResolvedValueOnce(makeResponse(responseText, false));
-    const element = addTestHTML("<p>Initial content</p>");
+    const element = addTestHTML(
+      "<p oyc-get='/some-url'>Initial content</p>",
+      oyc,
+    );
 
-    await handleFetch("get", "/some-url", element);
+    element.click();
 
-    expect(element.innerHTML).toBe("Initial content");
+    await waitFor(() => {
+      expect(element.innerHTML).toBe("Initial content");
+    });
   });
 });

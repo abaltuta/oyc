@@ -1,4 +1,3 @@
-import { processElementAndChildren } from "./oyc.js";
 // We reuse the DOMParser instead of creating a new one
 const domParser = new DOMParser();
 
@@ -16,9 +15,8 @@ export function parseHTML(htmlString, outputSelector) {
   // TODO: handle scripts
   const parsedHTML = domParser.parseFromString(
     `<body><template>${htmlString}</template></body>`,
-    "text/html"
+    "text/html",
   ).querySelector("template").content;
-
 
   if (outputSelector) {
     return parsedHTML.querySelector(outputSelector);
@@ -28,13 +26,16 @@ export function parseHTML(htmlString, outputSelector) {
 }
 
 /**
- * Inserts a fragment of HTML elements before a specified element in the DOM tree.
- * @param {Element} parent - The parent element where the fragment will be inserted.
- * @param {Node} insertBeforeNode - The element before which the fragment will be inserted.
- * @param {DocumentFragment | Element} fragment - The fragment of HTML elements to be inserted.
+ * Inserts a fragment of DOM nodes before a specified node in the parent node.
+ * Calls the provided callback function on each inserted element node.
+ *
+ * @param {Element} parent - The parent node where the fragment will be inserted.
+ * @param {Node} insertBeforeNode - The node before which the fragment will be inserted.
+ * @param {DocumentFragment | Element} fragment - The fragment of DOM nodes to be inserted.
+ * @param {Function} onProcess - The callback function to be called on each inserted element node.
  * @returns {void}
  */
-function insertBefore(parent, insertBeforeNode, fragment) {
+function insertBefore(parent, insertBeforeNode, fragment, onProcess) {
   while (fragment.childNodes.length > 0) {
     const child = fragment.firstChild;
     parent.insertBefore(child, insertBeforeNode);
@@ -43,7 +44,7 @@ function insertBefore(parent, insertBeforeNode, fragment) {
     ) {
       // TODO: process this later after all have been inserted because some code may expect all html to exist
       // This type assertion is safe because of the check above
-      processElementAndChildren(/** @type Element*/(child));
+      onProcess(/** @type Element*/ (child));
     }
   }
 }
@@ -53,12 +54,13 @@ function insertBefore(parent, insertBeforeNode, fragment) {
  *
  * @param {Element} targetElement - The target element whose outer HTML needs to be replaced.
  * @param {string} htmlString - The HTML string to replace the outer HTML of the target element.
+ * @param {Function} onProcess - The callback function to be called on each inserted element node.
  * @returns {void}
  */
-export function swapOuterHTML(targetElement, htmlString) {
+export function swapOuterHTML(targetElement, htmlString, onProcess) {
   const fragment = parseHTML(htmlString);
   const previousSibling = targetElement.previousSibling;
-  insertBefore(targetElement.parentElement, previousSibling, fragment);
+  insertBefore(targetElement.parentElement, previousSibling, fragment, onProcess);
 
   // Remove the remaining HTML
   // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this
@@ -69,16 +71,17 @@ export function swapOuterHTML(targetElement, htmlString) {
  * Replaces the HTML content of a target element with new HTML content.
  * @param {Element} targetElement - The element whose HTML content will be replaced.
  * @param {string} htmlString - The new HTML content to replace the old content with.
+ * @param {Function} onProcess - The callback function to be called on each inserted element node.
  * @returns {void}
  */
-export function swapInnerHTML(targetElement, htmlString) {
+export function swapInnerHTML(targetElement, htmlString, onProcess) {
   // TODO: Support multiple strategies for swapping HTML
   // TODO: Support full body refreshes and title changes
 
   const fragment = parseHTML(htmlString);
   const firstChild = targetElement.firstChild;
 
-  insertBefore(targetElement, firstChild, fragment);
+  insertBefore(targetElement, firstChild, fragment, onProcess);
 
   // Remove the remaining HTML
   // TODO: Maybe there's a faster way? Maybe using `Range` need to benchmark this

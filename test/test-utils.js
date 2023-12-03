@@ -1,5 +1,3 @@
-import { oyc } from "../src/oyc.js";
-
 /**
  * Creates a new Response object with the given content and status.
  * @param {string|Object} content - The content to include in the response. If an object is provided, it will be serialized to JSON.
@@ -12,7 +10,7 @@ export function makeResponse(content, ok = true) {
     typeof content === "string" ? content : JSON.stringify(content),
     ok
       ? { status: 200 }
-      : { status: 500 }
+      : { status: 500 },
   );
 }
 
@@ -61,7 +59,7 @@ export function getTestArea() {
  * @param {string} html - The HTML to add to the test area.
  * @returns {Element} - The last processed child element.
  */
-export function addTestHTML(html) {
+export function addTestHTML(html, oyc) {
   const fragment = document.createRange().createContextualFragment(html);
 
   const testArea = getTestArea();
@@ -77,9 +75,10 @@ export function addTestHTML(html) {
     child = fragment.children[0];
     // Append child is a move operation
     testArea.appendChild(child);
-    oyc.process(child);
   }
 
-  //Return last processed child
+  oyc.process(testArea);
+
+  // Return last processed child
   return child;
 }

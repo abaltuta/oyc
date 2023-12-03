@@ -28,7 +28,7 @@ declare global {
   // interface EventOYC {
   //     readonly currentTarget: HTMLElement;
   //     readonly target: HTMLElement;
-      
+
   //     readonly bubbles: boolean;
   //     cancelBubble: boolean;
   //     readonly cancelable: boolean;
@@ -63,4 +63,3 @@ declare global {
   //   readonly BUBBLING_PHASE: 3;
   // };
 }
-

@@ -8,8 +8,8 @@
   "main": "src/oyc.js",
   "scripts": {
     "build": "node ./scripts/build.js",
+    "coverage": "COVERAGE=1 vitest",
     "test": "vitest",
-    "test:coverage": "COVERAGE=1 vitest",
     "test:prod": "TEST_PROD=1 vitest"
   },
   "devDependencies": {
